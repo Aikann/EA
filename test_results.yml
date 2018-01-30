@@ -1,0 +1,81 @@
+# ==========================================================
+# = Solver Results                                         =
+# ==========================================================
+# ----------------------------------------------------------
+#   Problem Information
+# ----------------------------------------------------------
+Problem: 
+- Name: tmpvdbcesgv
+  Lower bound: 9.199999999999989
+  Upper bound: 9.199999999999989
+  Number of objectives: 1
+  Number of constraints: 36
+  Number of variables: 67
+  Number of nonzeros: 232
+  Sense: minimize
+# ----------------------------------------------------------
+#   Solver Information
+# ----------------------------------------------------------
+Solver: 
+- Status: ok
+  User time: 0.02
+  Termination condition: optimal
+  Termination message: MIP - Integer optimal solution\x3a Objective = 9.2000000000e+000
+  Statistics: 
+    Branch and bound: 
+      Number of bounded subproblems: 0
+      Number of created subproblems: 0
+  Error rc: 0
+  Time: 0.31047749519348145
+# ----------------------------------------------------------
+#   Solution Information
+# ----------------------------------------------------------
+Solution: 
+- number of solutions: 1
+  number of solutions displayed: 1
+- Gap: 0.0
+  Status: optimal
+  Message: None
+  Objective:
+    OBJ:
+      Value: 9.199999999999989
+  Variable:
+    P[1]:
+      Value: 1
+    P[3]:
+      Value: 1
+    R[2]:
+      Value: 1
+    x[1,1]:
+      Value: 1
+    x[10,1]:
+      Value: 1
+    x[11,2]:
+      Value: 1
+    x[14,3]:
+      Value: 1
+    x[15,1]:
+      Value: 1
+    x[16,1]:
+      Value: 1
+    x[17,3]:
+      Value: 1
+    x[18,1]:
+      Value: 1
+    x[19,3]:
+      Value: 1
+    x[2,2]:
+      Value: 1
+    x[3,3]:
+      Value: 1
+    x[4,1]:
+      Value: 1
+    x[5,3]:
+      Value: 1
+    x[7,2]:
+      Value: 1
+    x[8,1]:
+      Value: 1
+    x[9,1]:
+      Value: 1
+  Constraint: No values
