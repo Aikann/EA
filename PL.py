@@ -16,7 +16,7 @@ model = AbstractModel()
 
 model.cardN = Param(within=NonNegativeIntegers) #nombre de colis
 model.cardV = Param(within=NonNegativeIntegers) #nombre de vols
-#model.cardK = Param(within=NonNegativeIntegers) #nombre de type de soutes
+model.cardK = Param(within=NonNegativeIntegers) #nombre de type de soutes
 
 
 
@@ -37,8 +37,8 @@ model.W_max = Param(model.indexV, within=NonNegativeReals) #poids max des avions
 #model.T_d = Param(model.indexV, within=NonNegativeReals) #date de départ des vols
 #model.T_f = Param(model.indexV, within=NonNegativeReals) #date de d'arrivée des vols
 
-#model.s = Param(model.indexN, model.indexK, within=NonNegativeIntegers) #nombre de compartiments de type k nécessaires pour le colis i
-#model.S_max = Param(model.indexV, model.indexK, within=NonNegativeIntegers) #nombre de compartiments de type k disponibles dans le vol v
+model.s = Param(model.indexN, model.indexK, within=NonNegativeIntegers) #nombre de compartiments de type k nécessaires pour le colis i
+model.S_max = Param(model.indexV, model.indexK, within=NonNegativeIntegers) #nombre de compartiments de type k disponibles dans le vol v
 
 model.p = Param(model.indexN, within=Binary) #colis périssable
 model.r = Param(model.indexN, within=Binary) #colis radioactif
@@ -98,7 +98,7 @@ model.C6 = Constraint(model.indexN, rule=Depart_unique)
 
 def Gestion_palette(model, v, k): #satisfaire les demandes de position des colis
     return (sum(model.x[i,v]*model.s[i,k] for i in model.indexN) <= model.S_max[v,k])
-#model.C7 = Constraint(model.indexV, model.indexK, rule=Gestion_palette)
+model.C7 = Constraint(model.indexV, model.indexK, rule=Gestion_palette)
 
 
 
