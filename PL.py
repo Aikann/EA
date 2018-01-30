@@ -24,7 +24,7 @@ model.cardK = Param(within=NonNegativeIntegers) #nombre de type de soutes
 
 model.indexN = RangeSet(model.cardN) # [N]
 model.indexV = RangeSet(model.cardV) # [V]
-#model.indexK = RangeSet(model.cardK) # [K]
+model.indexK = RangeSet(model.cardK) # [K]
 
 model.V = Param(model.indexN, within=NonNegativeReals) #volume des colis
 model.W = Param(model.indexN, within=NonNegativeReals) #poids des colis
@@ -37,11 +37,11 @@ model.W_max = Param(model.indexV, within=NonNegativeReals) #poids max des avions
 #model.T_d = Param(model.indexV, within=NonNegativeReals) #date de départ des vols
 #model.T_f = Param(model.indexV, within=NonNegativeReals) #date de d'arrivée des vols
 
-model.s = Param(model.indexN, model.indexK, within=NonNegativeIntegers) #nombre de compartiments de type k nécessaires pour le colis i
-model.S_max = Param(model.indexV, model.indexK, within=NonNegativeIntegers) #nombre de compartiments de type k disponibles dans le vol v
+model.s = Param(model.indexN, model.indexK, within=NonNegativeReals) #nombre de compartiments de type k nécessaires pour le colis i
+model.S_max = Param(model.indexV, model.indexK, within=NonNegativeReals) #nombre de compartiments de type k disponibles dans le vol v
 
-model.p = Param(model.indexN, within=Binary) #colis périssable
-model.r = Param(model.indexN, within=Binary) #colis radioactif
+model.p = Param(model.indexN, within=NonNegativeReals) #colis périssable
+model.r = Param(model.indexN, within=NonNegativeReals) #colis radioactif
 
 
 """DECLARATION DES VARIABLES"""
@@ -116,4 +116,4 @@ model.C9 = Constraint(model.indexN, model.indexV, rule=Avion_radioactif)
 
 def Avion_perissable(model,i,v): #permet de savoir si un avion transporte un colis périssable
     return(model.P[v] >= model.p[i]*model.x[i,v] )
-model.C10 = Constraint(model.indexV, rule=Avion_perissable)
+model.C10 = Constraint(model.indexN, model.indexV, rule=Avion_perissable)

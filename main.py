@@ -12,9 +12,9 @@ from xlwt import Workbook, easyxf
 import pandas as pd
 import numpy as np
 
-data_filename='test'
-bookings_filename='data_bookings'
-schedule_filename='data_schedule'
+data_filename='input'
+bookings_filename='data_bookings_250118'
+schedule_filename='data_schedule_250118'
 
 
 opt = SolverFactory('cplex')
@@ -30,7 +30,7 @@ print("Ecriture...")
 #Récupération de certaines données
 wb = pd.read_csv(bookings_filename+'.csv',sep=';')
 bookings_names = np.array(wb['Id'])
-bookings_position= np.array(wb['MDP','LDP','LDC'])
+bookings_position= np.array(wb[['MDP','LDP','LDC']].fillna(0))
 wb = pd.read_csv(schedule_filename+'.csv',sep=';')
 aircraft_names = np.array(wb['Aircraft'])
 
@@ -58,13 +58,13 @@ for i in range(1,cardN+1):
         if instance.x[i,v]==1:
             feuil1.write(i,1,"Accepté")
             feuil1.write(i,2,aircraft_names[v-1])
-            feuil1.write(i,3,str(bookings_position[0,i-1]))
-            feuil1.write(i,4,str(bookings_position[1,i-1]))
-            feuil1.write(i,5,str(bookings_position[2,i-1]))
+            feuil1.write(i,3,int(bookings_position[i-1,0]))
+            feuil1.write(i,4,int(bookings_position[i-1,1]))
+            feuil1.write(i,5,int(bookings_position[i-1,2]))
             accepted=True
     if not accepted:
             feuil1.write(i,1,"Refusé")
                 
-book.save(data_filename+'.xls')
+book.save("output_"+bookings_filename+'.xls')
 
 print("Fini !")
