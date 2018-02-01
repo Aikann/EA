@@ -13,8 +13,8 @@ import pandas as pd
 import numpy as np
 
 data_filename='input'
-bookings_filename='data_bookings_250118'
-schedule_filename='data_schedule_250118'
+bookings_filename='data_bookings_300118'
+schedule_filename='data_schedule_300118'
 
 
 opt = SolverFactory('cplex')
@@ -28,10 +28,10 @@ print(results)
 print("Ecriture...")
 
 #Récupération de certaines données
-wb = pd.read_csv(bookings_filename+'.csv',sep=';')
+wb = pd.read_csv(bookings_filename+'.csv',sep=';',encoding='latin-1')
 bookings_names = np.array(wb['Id'])
 bookings_position= np.array(wb[['MDP','LDP','LDC']].fillna(0))
-wb = pd.read_csv(schedule_filename+'.csv',sep=';')
+wb = pd.read_csv(schedule_filename+'.csv',sep=';',encoding='latin-1')
 aircraft_names = np.array(wb['Aircraft'])
 
 #Création du workbook 

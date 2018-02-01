@@ -1,0 +1,4 @@
+Aircraft;Heure départ;Heure d'arrivée;Origin;Destination;MDP (# palets available);LDP (# palets available);LDC (# palets available);Bulk (volume available);Bulk (max weight)
+AF22;09:10;12:00;CDG;JFK ;3;3;2;0;0
+AF3628;10:25;13:22;CDG;JFK ;2;2;1;5;3000
+AF6;13:46;16:06;CDG;JFK ;3;0;2;10;5000

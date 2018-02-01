@@ -32,16 +32,18 @@ model.W = Param(model.indexN, within=NonNegativeReals) #poids des colis
 model.V_max = Param(model.indexV, within=NonNegativeReals) #volume max des avions
 model.W_max = Param(model.indexV, within=NonNegativeReals) #poids max des avions
 
-#model.t_d = Param(model.indexN, within=NonNegativeReals) #date de dispo des colis
-#model.t_f = Param(model.indexN, within=NonNegativeReals) #date de d'arrivée des colis
-#model.T_d = Param(model.indexV, within=NonNegativeReals) #date de départ des vols
-#model.T_f = Param(model.indexV, within=NonNegativeReals) #date de d'arrivée des vols
+model.t_d = Param(model.indexN, within=NonNegativeReals) #date de dispo des colis
+model.t_f = Param(model.indexN, within=NonNegativeReals) #date d'arrivée des colis
+model.T_d = Param(model.indexV, within=NonNegativeReals) #date de départ des vols
+model.T_f = Param(model.indexV, within=NonNegativeReals) #date d'arrivée des vols
 
 model.s = Param(model.indexN, model.indexK, within=NonNegativeReals) #nombre de compartiments de type k nécessaires pour le colis i
 model.S_max = Param(model.indexV, model.indexK, within=NonNegativeReals) #nombre de compartiments de type k disponibles dans le vol v
 
 model.p = Param(model.indexN, within=NonNegativeReals) #colis périssable
 model.r = Param(model.indexN, within=NonNegativeReals) #colis radioactif
+
+model.g = Param(model.indexN, within=NonNegativeReals) #gain des colis
 
 
 """DECLARATION DES VARIABLES"""
@@ -78,15 +80,15 @@ model.C3 = Constraint(model.indexV, rule=Poids_Max)
 
 
 
-def Timing_depart(model,i): #un colis ne part que s'il est dispo
-    return (model.t_d[i] <= sum([model.T_d[v]*model.x[i,v] for v in range(1,model.cardV+1)]))
-#model.C4 = Constraint(model.indexN, rule=Timing_depart)
+def Timing_depart(model,i,v): #un colis ne part que s'il est dispo
+    return (model.t_d[i]*model.x[i,v] <= model.T_d[v]*model.x[i,v])
+model.C4 = Constraint(model.indexN, model.indexV, rule=Timing_depart)
 
 
 
-def Timing_arrivee(model,i): #un colis ne part que s'il arrive à temps
-    return (sum([model.T_f[v]*model.x[i,v] for v in range(1,model.cardV+1)]) <= model.t_f[i])
-#model.C5 = Constraint(model.indexN, rule=Timing_arrivee)
+def Timing_arrivee(model,i,v): #un colis ne part que s'il arrive à temps
+    return (model.T_f[v]*model.x[i,v] <= model.t_f[i]*model.x[i,v])
+model.C5 = Constraint(model.indexN, model.indexV, rule=Timing_arrivee)
 
 
 

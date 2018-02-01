@@ -1,8 +1,9 @@
 import pandas as pd
+from HourToFloat import HourToFloat
 
 # ouverture des données
-bookings = pd.read_csv("data_bookings_250118.csv", sep=";", index_col="Id")
-schedule = pd.read_csv("data_schedule_250118.csv", sep=";", index_col="Aircraft")
+bookings = pd.read_csv("data_bookings_300118.csv", sep=";", index_col="Id", encoding='latin-1')
+schedule = pd.read_csv("data_schedule_300118.csv", sep=";", index_col="Aircraft", encoding='latin-1')
 
 # définition des caractéristiques des palettes
 MDP_volume = 18
@@ -80,6 +81,31 @@ for c in range(len(schedule)):
     inp.write(str(c + 1) + " 1 " + str(schedule["MDP (# palets available)"][c]) + "\n")
     inp.write(str(c + 1) + " 2 " + str(schedule["LDP (# palets available)"][c]) + "\n")
     inp.write(str(c + 1) + " 3 " + str(schedule["LDC (# palets available)"][c]) + "\n")
+inp.write(";\n")
+
+inp.write("param g := "+"\n")
+for c in range(len(bookings)):
+    inp.write(str(c+1)+" "+str(bookings["Revenue"][c])+"\n")
+inp.write(";\n")
+
+inp.write("param t_d := "+"\n")
+for c in range(len(bookings)):
+    inp.write(str(c+1)+" "+str(HourToFloat(bookings["Heure disponibilité "][c]))+"\n")
+inp.write(";\n")
+
+inp.write("param t_f := "+"\n")
+for c in range(len(bookings)):
+    inp.write(str(c+1)+" "+str(HourToFloat(bookings["Heure d'arrivée"][c]))+"\n")
+inp.write(";\n")
+
+inp.write("param T_d := "+"\n")
+for c in range(len(schedule)):
+    inp.write(str(c+1)+" "+str(HourToFloat(schedule["Heure départ"][c]))+"\n")
+inp.write(";\n")
+
+inp.write("param T_f := "+"\n")
+for c in range(len(schedule)):
+    inp.write(str(c+1)+" "+str(HourToFloat(schedule["Heure d'arrivée"][c]))+"\n")
 inp.write(";\n")
 
 inp.close()
