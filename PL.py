@@ -17,6 +17,7 @@ model = AbstractModel()
 model.cardN = Param(within=NonNegativeIntegers) #nombre de colis
 model.cardV = Param(within=NonNegativeIntegers) #nombre de vols
 model.cardK = Param(within=NonNegativeIntegers) #nombre de type de soutes
+model.eta = 10 #quantité minimale d'argent à partir de laquelle on favorise le gaindevant 1m^3 de volume
 
 
 
@@ -51,17 +52,20 @@ model.g = Param(model.indexN, within=NonNegativeReals) #gain des colis
 model.x = Var(model.indexN, model.indexV, domain=Binary) #variable indiquant si le colis i est pris par le vol v
 model.R = Var(model.indexV, domain=Binary) #vol considéré comme transportant des colis radioactifs
 model.P = Var(model.indexV, domain=Binary) #vol considéré comme transportant des colis périssables
+model.alpha = Var(domain=NonNegativeReals) #équilibrage des avions 
 
 
 
 """DECLARATION DE L'OBJECTIF"""
 
-def ObjRule(model): #volume restant
-    V_restant = 0
+def ObjRule(model): #volume restant - lambda*gain
+    V_restant, gain = 0, 0
     for v in range(1,model.cardV+1):
-        S=sum([model.V[i] * model.x[i,v] for i in range(1,model.cardN+1)])
-        V_restant += model.V_max[v] - S    
-    return V_restant
+        S=sum([model.V[i] * model.x[i,v] for i in model.indexN])
+        V_restant += model.V_max[v] - S   
+        gain = gain + sum([model.g[i] * model.x[i,v] for i in model.indexN])
+    l=(sum([model.V_max[v] for v in model.indexV]))/model.eta
+    return V_restant - l*gain + model.alpha
 model.OBJ = Objective(rule=ObjRule)
 
 
@@ -69,13 +73,13 @@ model.OBJ = Objective(rule=ObjRule)
 """DECLARATION DES CONTRAINTES"""
 
 def Volume_Max(model,v): #volume max des avions
-    return (sum([model.V[i]*model.x[i,v] for i in range(1,model.cardN+1)]) <= model.V_max[v])    
+    return (sum([model.V[i]*model.x[i,v] for i in model.indexN]) <= model.V_max[v])    
 model.C2 = Constraint(model.indexV, rule=Volume_Max)
 
 
 
 def Poids_Max(model,v): #poids max des avions
-    return (sum([model.W[i]*model.x[i,v] for i in range(1,model.cardN+1)]) <= model.W_max[v])   
+    return (sum([model.W[i]*model.x[i,v] for i in model.indexN]) <= model.W_max[v])   
 model.C3 = Constraint(model.indexV, rule=Poids_Max)
 
 
@@ -93,7 +97,7 @@ model.C5 = Constraint(model.indexN, model.indexV, rule=Timing_arrivee)
 
 
 def Depart_unique(model,i): #tout colis ne part qu'au plus une fois
-    return(sum([model.x[i,v] for v in range(1,model.cardV+1)]) <= 1)
+    return(sum([model.x[i,v] for v in model.indexV]) <= 1)
 model.C6 = Constraint(model.indexN, rule=Depart_unique)
 
 
@@ -119,3 +123,7 @@ model.C9 = Constraint(model.indexN, model.indexV, rule=Avion_radioactif)
 def Avion_perissable(model,i,v): #permet de savoir si un avion transporte un colis périssable
     return(model.P[v] >= model.p[i]*model.x[i,v] )
 model.C10 = Constraint(model.indexN, model.indexV, rule=Avion_perissable)
+
+def Equilibrage(model,v1,v2): #équilibrage des avions
+    return(model.V_max[v2]*sum([model.V[i] * model.x[i,v1] for i in model.indexN]) - model.V_max[v1]*sum([model.V[i] * model.x[i,v2] for i in model.indexN]) <= model.alpha*model.V_max[v1]*model.V_max[v2])
+model.C13 = Constraint(model.indexV, model.indexV, rule=Equilibrage)

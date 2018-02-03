@@ -46,16 +46,30 @@ feuil1.write(0,3,'MDP')
 feuil1.write(0,4,'LDP')
 feuil1.write(0,5,'LDC')
 
+feuil1.write(0,7,'Aircraft')
+feuil1.write(0,8,'Remplissage (%)')
+feuil1.write(0,9,"Gain de l'avion")
+feuil1.write(0,10,'Liste des colis')
+
+feuil1.write(0,12,'Gain total')
+feuil1.write(0,13,'Remplissage total (%)')
+
 # Récupération du nombre de vols et de colis
 cardV=instance.cardV.value
 cardN=instance.cardN.value
 
 #Ecriture des résultats
+L=[[] for v in range(cardV)] # liste de la liste des colis
+V=[0 for v in range(cardV)] # liste des volumes des avions
+G=[0 for v in range(cardV)] # liste des gains des avions
 for i in range(1,cardN+1):
     accepted=False
     feuil1.write(i,0,bookings_names[i-1])
     for v in range(1,cardV+1):    
-        if instance.x[i,v]==1:
+        if instance.x[i,v].value>=0.999:
+            L[v-1].append(bookings_names[i-1])
+            V[v-1] += instance.V[i]
+            G[v-1] += instance.g[i]
             feuil1.write(i,1,"Accepté")
             feuil1.write(i,2,aircraft_names[v-1])
             feuil1.write(i,3,int(bookings_position[i-1,0]))
@@ -64,6 +78,15 @@ for i in range(1,cardN+1):
             accepted=True
     if not accepted:
             feuil1.write(i,1,"Refusé")
+V_tot=0
+for v in range(1,cardV+1):
+    V_tot += instance.V_max[v] 
+    feuil1.write(v,7,aircraft_names[v-1])
+    feuil1.write(v,8,100*V[v-1]/instance.V_max[v])
+    feuil1.write(v,9,G[v-1])
+    feuil1.write(v,10,str(L[v-1]))
+feuil1.write(1,12,sum(G))
+feuil1.write(1,13,100*sum(V)/V_tot)
                 
 book.save("output_"+bookings_filename+'.xls')
 
