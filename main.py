@@ -13,8 +13,8 @@ import pandas as pd
 import numpy as np
 
 data_filename='input'
-bookings_filename='data_bookings_300118'
-schedule_filename='data_schedule_300118'
+bookings_filename='data_bookings_060218'
+schedule_filename='data_schedule_060218'
 
 
 opt = SolverFactory('cplex')
@@ -88,6 +88,6 @@ for v in range(1,cardV+1):
 feuil1.write(1,12,sum(G))
 feuil1.write(1,13,100*sum(V)/V_tot)
                 
-book.save("output_"+bookings_filename+'.xls')
+book.save("output_"+bookings_filename+'2.xls')
 
 print("Fini !")

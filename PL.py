@@ -17,7 +17,7 @@ model = AbstractModel()
 model.cardN = Param(within=NonNegativeIntegers) #nombre de colis
 model.cardV = Param(within=NonNegativeIntegers) #nombre de vols
 model.cardK = Param(within=NonNegativeIntegers) #nombre de type de soutes
-model.eta = 10 #quantité minimale d'argent à partir de laquelle on favorise le gaindevant 1m^3 de volume
+model.eta = 1 #quantité minimale d'argent à partir de laquelle on favorise le gaindevant 1m^3 de volume
 
 
 
@@ -45,6 +45,10 @@ model.p = Param(model.indexN, within=NonNegativeReals) #colis périssable
 model.r = Param(model.indexN, within=NonNegativeReals) #colis radioactif
 
 model.g = Param(model.indexN, within=NonNegativeReals) #gain des colis
+
+model.pch = Param(model.indexN, within=NonNegativeReals) #possibilité changement hub
+model.o_c = Param(model.indexN) # origine des colis
+model.o_a = Param(model.indexV) # origine des avions
 
 
 """DECLARATION DES VARIABLES"""
@@ -124,6 +128,15 @@ def Avion_perissable(model,i,v): #permet de savoir si un avion transporte un col
     return(model.P[v] >= model.p[i]*model.x[i,v] )
 model.C10 = Constraint(model.indexN, model.indexV, rule=Avion_perissable)
 
+
 def Equilibrage(model,v1,v2): #équilibrage des avions
     return(model.V_max[v2]*sum([model.V[i] * model.x[i,v1] for i in model.indexN]) - model.V_max[v1]*sum([model.V[i] * model.x[i,v2] for i in model.indexN]) <= model.alpha*model.V_max[v1]*model.V_max[v2])
 model.C13 = Constraint(model.indexV, model.indexV, rule=Equilibrage)
+
+
+def PCH(model,i,v): #contrainte de changement de hub
+    if model.pch[i]==1:
+        return Constraint.Feasible
+    else:
+        return (model.x[i,v]*model.o_c[i] == model.x[i,v]*model.o_a[v])
+model.C14 = Constraint(model.indexN, model.indexV, rule=PCH)

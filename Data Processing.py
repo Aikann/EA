@@ -2,8 +2,8 @@ import pandas as pd
 from HourToFloat import HourToFloat
 
 # ouverture des données
-bookings = pd.read_csv("data_bookings_300118.csv", sep=";", index_col="Id", encoding='latin-1')
-schedule = pd.read_csv("data_schedule_300118.csv", sep=";", index_col="Aircraft", encoding='latin-1')
+bookings = pd.read_csv("data_bookings_060218.csv", sep=";", index_col="Id", encoding='latin-1')
+schedule = pd.read_csv("data_schedule_060218.csv", sep=";", index_col="Aircraft", encoding='latin-1')
 
 # définition des caractéristiques des palettes
 MDP_volume = 18
@@ -19,6 +19,10 @@ bookings["Radioactive"] = [int((bookings["Type"][i]=="RAD")) for i in range(len(
 
 # remplissage des données manquantes par 0
 bookings = bookings.fillna(0)
+
+# gestion des origines des colis et des avions
+bookings["Origine"] = [2*int((bookings["Origin"][i]=="CDG")) - 1 for i in range(len(bookings))]
+schedule["Origine"] = [2*int((schedule["Origin"][i]=="CDG")) - 1 for i in range(len(schedule))]
 
 # remplacement du volume de l'objet par le volume réservé
 for c in range(len(bookings)):
@@ -106,6 +110,21 @@ inp.write(";\n")
 inp.write("param T_f := "+"\n")
 for c in range(len(schedule)):
     inp.write(str(c+1)+" "+str(HourToFloat(schedule["Heure d'arrivée"][c]))+"\n")
+inp.write(";\n")
+
+inp.write("param o_c := "+"\n")
+for c in range(len(bookings)):
+    inp.write(str(c+1)+" "+str(bookings["Origine"][c])+"\n")
+inp.write(";\n")
+
+inp.write("param o_a := "+"\n")
+for c in range(len(schedule)):
+    inp.write(str(c+1)+" "+str(schedule["Origine"][c])+"\n")
+inp.write(";\n")
+
+inp.write("param pch := "+"\n")
+for c in range(len(bookings)):
+    inp.write(str(c+1)+" "+str(bookings["Possibilité changement hub "][c])+"\n")
 inp.write(";\n")
 
 inp.close()
