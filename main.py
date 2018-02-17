@@ -7,7 +7,7 @@ Created on Fri Jan 26 16:52:35 2018
 
 from __future__ import division
 from pyomo.environ import *
-from PL import model
+from PL import model #choose model
 from xlwt import Workbook, easyxf
 import pandas as pd
 import numpy as np
@@ -21,9 +21,35 @@ opt = SolverFactory('cplex')
 
 print('Création du modèle...')
 instance = model.create_instance(data_filename+'.dat')
-print('Résolution...')
+print('Résolution pour le gain...')
 results = opt.solve(instance)
 print(results)
+
+
+
+instance.alpha = Var(within=NonNegativeReals)
+
+def Equilibrage(model,v1,v2): #équilibrage des avions
+    return(model.V_max[v2]*sum([model.V[i] * model.x[i,v1] for i in model.indexN]) - model.V_max[v1]*sum([model.V[i] * model.x[i,v2] for i in model.indexN]) <= model.alpha*model.V_max[v1]*model.V_max[v2])
+instance.C13 = Constraint(instance.indexV, instance.indexV, rule=Equilibrage)
+
+G=sum([sum([instance.x[i,v].value*instance.g[i] for i in instance.indexN]) for v in instance.indexV])
+print('*** \nG',G,'\n***')
+
+def Gain_total(model):
+    return (sum([sum([model.x[i,v]*model.g[i] for i in model.indexN]) for v in model.indexV]) >= G)
+instance.CG = Constraint(rule=Gain_total)
+
+instance.del_component('OBJ')
+
+def NewObjRule(model):
+    return model.alpha
+instance.OBJ = Objective(rule=NewObjRule)
+
+print('Résolution pour le remplissage...')
+results = opt.solve(instance)
+print(results)
+
  
 print("Ecriture...")
 

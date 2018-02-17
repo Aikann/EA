@@ -56,7 +56,7 @@ model.o_a = Param(model.indexV) # origine des avions
 model.x = Var(model.indexN, model.indexV, domain=Binary) #variable indiquant si le colis i est pris par le vol v
 model.R = Var(model.indexV, domain=Binary) #vol considéré comme transportant des colis radioactifs
 model.P = Var(model.indexV, domain=Binary) #vol considéré comme transportant des colis périssables
-#model.alpha = Var(domain=NonNegativeReals) #équilibrage des avions 
+model.alpha = Var(domain=NonNegativeReals) #équilibrage des avions 
 
 
 
@@ -69,7 +69,7 @@ def ObjRule(model): #volume restant - lambda*gain
         #V_restant += model.V_max[v] - S   
         gain = gain + sum([model.g[i] * model.x[i,v] for i in model.indexN])
     #l=(sum([model.V_max[v] for v in model.indexV]))/model.eta
-    return -gain #+ model.alpha
+    return -gain + model.alpha
 model.OBJ = Objective(rule=ObjRule)
 
 
@@ -131,7 +131,7 @@ model.C10 = Constraint(model.indexN, model.indexV, rule=Avion_perissable)
 
 def Equilibrage(model,v1,v2): #équilibrage des avions
     return(model.V_max[v2]*sum([model.V[i] * model.x[i,v1] for i in model.indexN]) - model.V_max[v1]*sum([model.V[i] * model.x[i,v2] for i in model.indexN]) <= model.alpha*model.V_max[v1]*model.V_max[v2])
-#model.C13 = Constraint(model.indexV, model.indexV, rule=Equilibrage)
+model.C13 = Constraint(model.indexV, model.indexV, rule=Equilibrage)
 
 
 def PCH(model,i,v): #contrainte de changement de hub
